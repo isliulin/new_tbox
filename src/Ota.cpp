@@ -255,7 +255,7 @@ BOOL COta ::Processing(void)
 		}
 		else
 		{
-			m_u8WorkMode = WORKMODE_NOTREADY;	
+			m_u8WorkMode = WORKMODE_NOTREADY;
 			OTALOG("[ERROR] fw not ready!!\n");
 		}
 		
