@@ -1,5 +1,6 @@
 #include "framework.h"
 #include <errno.h>
+#include <Nvm.h>
 #include "BIF.h"
 #include "VIF.h"
 #include "TPAK.h"
@@ -130,6 +131,19 @@ else
   ID_Queue_FW_To_OTA = msgget(ftok("/data/tbox", 10), IPC_CREAT | 0777);
   ID_Queue_FW_To_PWR = msgget(ftok("/data/tbox", 11), IPC_CREAT | 0777);
   ID_Queue_FW_To_NVM = msgget(ftok("/data/tbox", 12), IPC_CREAT | 0777);
+
+  printf(" ==== %d \n ", ID_Queue_MCU_To_FW);
+  printf(" ==== %d \n ", ID_Queue_BLE_To_FW);
+  printf(" ==== %d \n ", ID_Queue_TSP_To_FW);
+  printf(" ==== %d \n ", ID_Queue_OTA_To_FW);
+  printf(" ==== %d \n ", ID_Queue_PWR_To_FW);
+  printf(" ==== %d \n ", ID_Queue_NVM_To_FW);
+  printf(" ==== %d \n ", ID_Queue_FW_To_MCU);
+  printf(" ==== %d \n ", ID_Queue_FW_To_BLE);
+  printf(" ==== %d \n ", ID_Queue_FW_To_TSP);
+  printf(" ==== %d \n ", ID_Queue_FW_To_OTA);
+  printf(" ==== %d \n ", ID_Queue_FW_To_PWR);
+  printf(" ==== %d \n ", ID_Queue_FW_To_NVM);
 
   if (ID_Queue_MCU_To_FW < 0 || ID_Queue_BLE_To_FW < 0 || ID_Queue_TSP_To_FW < 0 || ID_Queue_OTA_To_FW < 0 ||
       ID_Queue_PWR_To_FW < 0 || ID_Queue_NVM_To_FW < 0 || ID_Queue_FW_To_MCU < 0 || ID_Queue_FW_To_BLE < 0 ||
@@ -581,6 +595,12 @@ void Framework::Rcv_Queue_Nvm_To_FW() {
            mFwQueueInfoRev.head.Gr);
   } else {
 //     printf("[**GR_THD_SOURCE_FW Nvm**]  no receive data !!!,errno=%d[%s]\n",errno,strerror(errno));
+  }
+
+  switch (mFwQueueInfoRev.head.Id) {
+    case ID_NVM_2_FW_SYNC:printf("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxID_NVM_2_FW_SYNC \n");
+      m_fw_syncFlg[ID_THREAD_NVM] = 1;
+      break;
   }
 
 #if VIVIAN_ADD_MONITOR
@@ -1103,17 +1123,20 @@ int Framework::fw_OtaSendQueue(uint8_t Id) {
 
 int Framework::fw_NvmSendQueue(uint8_t Id) {
   int retLen;
-  uint16_t msgLen =1024;
+  uint16_t msgLen = 1024;
 
   mFwQueueInfoSnd.mtype = 1;
   mFwQueueInfoSnd.head.Gr = (uint8_t) GR_THD_SOURCE_NVM;
-  mFwQueueInfoSnd.head.Id = (uint8_t) ID_FW_2_NVM_FWINFO;
+  mFwQueueInfoSnd.head.Id = (uint8_t) ID_FW_2_NVM_SET_CONFIG;
   memset(mFwQueueInfoSnd.Msgs, 0, sizeof(mFwQueueInfoSnd.Msgs));
-  memcpy(mFwQueueInfoSnd.Msgs, "9", msgLen);
+
+  memcpy(mFwQueueInfoSnd.Msgs, "999999999", sizeof("999999999"));
+
+  printf("********** %s \n", mFwQueueInfoSnd.Msgs);
 
   retLen = msgsnd(m_instance->ID_Queue_FW_To_NVM,
                   (void *) &mFwQueueInfoSnd,
-                  msgLen + sizeof(ParaInfoHead_ST),
+                  sizeof("999999999") + sizeof(ParaInfoHead_ST),
                   IPC_NOWAIT);
 }
 

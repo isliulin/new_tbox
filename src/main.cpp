@@ -775,6 +775,7 @@ int main(int argc, char *argv[]) {
   if(nas_init() == 0)
     DEBUGLOG("nas_init success!");
 #endif
+
   bleUart::Get_BleInstance();
   CFAWACP::GetInstance();
 
@@ -795,7 +796,7 @@ int main(int argc, char *argv[]) {
       printf("gl_CFrameWork_instance->Init() fail\r\n");
     }
   }
-#if 0
+#if 1
   if (gl_CPwr_instance != NULL) {
     if (gl_CPwr_instance->Init()) {
       gl_CPwr_instance->Run();
@@ -804,6 +805,8 @@ int main(int argc, char *argv[]) {
     }
   }
 #endif
+
+#if 1
   if (gl_CMcu_instance != NULL) {
     if (gl_CMcu_instance->Init()) {
       gl_CMcu_instance->Run();
@@ -811,6 +814,8 @@ int main(int argc, char *argv[]) {
       printf("gl_CMcu_instance->Init() \r\n");
     }
   }
+
+#endif
 #if 0
   if (gl_CTsp_instance != NULL) {
     if (gl_CTsp_instance->Init()) {
@@ -859,6 +864,7 @@ int main(int argc, char *argv[]) {
       printf("gl_CNvm_instance->Init() \r\n");
     }
   }
+
 #endif
 #if 0
   if(gl_COta_instance != NULL)
@@ -972,9 +978,10 @@ int main(int argc, char *argv[]) {
 //  datacall_info_type datacall_info;
 //  nas_serving_system_type_v01 nas_status;
 
-
 //	Set_CpuFreqValue(CPU_NAX_FREQ);
   while (1) {
+
+    Framework::GetInstance()->fw_NvmSendQueue(ID_FW_2_NVM_SET_CONFIG);
     sleep(5);
   }
 

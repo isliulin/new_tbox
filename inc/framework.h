@@ -66,7 +66,7 @@ public:
     int fw_McuSendQueue(uint8_t Id);
     int fw_PwrSendQueue(uint8_t Id);
     int fw_OtaSendQueue(uint8_t Id);
-    int fw_NvmSendQueue(uint8_t Id);
+    static int fw_NvmSendQueue(uint8_t Id);
     int fw_TspSendQueue(uint8_t Id);
     int fw_BleSendQueue(uint8_t Id);
     int fw_LogSendQueue(uint8_t Id);
