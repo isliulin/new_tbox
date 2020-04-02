@@ -1127,7 +1127,7 @@ int Framework::fw_NvmSendQueue(uint8_t Id) {
 
   mFwQueueInfoSnd.mtype = 1;
   mFwQueueInfoSnd.head.Gr = (uint8_t) GR_THD_SOURCE_NVM;
-  mFwQueueInfoSnd.head.Id = (uint8_t) ID_FW_2_NVM_SET_CONFIG;
+  mFwQueueInfoSnd.head.Id = (uint8_t) ID_FW_2_NVM_THD_SET_CONFIG;
   memset(mFwQueueInfoSnd.Msgs, 0, sizeof(mFwQueueInfoSnd.Msgs));
 
   memcpy(mFwQueueInfoSnd.Msgs, "999999999", sizeof("999999999"));

@@ -21,14 +21,14 @@
 #define DEFAULT_CMEI                    "3333"
 #define DEFAULT_ICCID                   "4444"
 
-#define DEFAULT_OLD_OSID                "1231"
-#define DEFAULT_OLD_MCU_VERSION         "1232"
-#define DEFAULT_OLD_BLE_VERSION         "1233"
-#define DEFAULT_OLD_OS_VERSION          "1234"
-#define DEFAULT_NEW_OSID                "2231"
-#define DEFAULT_NEW_MCU_VERSION         "2232"
-#define DEFAULT_NEW_BLE_VERSION         "2233"
-#define DEFAULT_NEW_OS_VERSION          "2234"
+#define DEFAULT_OLD_OSID                "0"
+#define DEFAULT_OLD_MCU_VERSION         "0"
+#define DEFAULT_OLD_BLE_VERSION         "0"
+#define DEFAULT_OLD_OS_VERSION          "0"
+#define DEFAULT_NEW_OSID                "0"
+#define DEFAULT_NEW_MCU_VERSION         "0"
+#define DEFAULT_NEW_BLE_VERSION         "0"
+#define DEFAULT_NEW_OS_VERSION          "0"
 
 #define DEFAULT_HOST                  "192.168.1.18"
 #define DEFAULT_PORTS                 3333
@@ -78,11 +78,11 @@
 #pragma pack(1)
 
 typedef enum NVM_WorkMode_Tag {
-  NVMWORK_NOTREADY,
   NVMWORK_INIT,
   NVMWORK_NORMAL,
-  NVMWORK_ALL,
-  NVMWORK_BUSY
+  NVMWORK_BUSY,
+  NVMWORK_NOTREADY,
+  NVMWORK_ALL
 } NVM_WorkMode_ENUM;
 
 typedef struct NVM_Firmware_Parameter_Tag {
@@ -100,22 +100,22 @@ typedef struct NVM_Upgrade_Parameter_Tag {
 } NVM_Upgrade_Parameter_ST;
 
 typedef struct NVM_MQTT_Config_Tag {
-  uint8_t m_Host[64];    //MQTT Server Host
-  uint16_t m_Ports;
-  uint16_t m_uReportFreq;
+  uint8_t m_ServerHost[64];    //MQTT Server Host
+  uint16_t m_ServerPorts;
+  uint16_t m_NormalReportFreq;
   uint8_t m_PskId[64];
   uint8_t m_CarType[16];
   uint8_t m_HexPSK[64];
   uint8_t m_StrPSK[64];
   uint16_t m_Alarm;
-  uint16_t m_ReportFreq;
+  uint16_t m_SleepReportFreq;
   bool m_LogSwitch;
   uint8_t m_Password[64];
   uint8_t m_ClientId[64];
   uint8_t m_Username[64];
   uint16_t m_Port;
   uint16_t m_KeepAlive;
-  uint16_t m_MsgMaxSisz;
+  uint16_t m_MsgMaxSize;
   uint16_t m_TopicMaxSize;
   int m_TestOrNormal;
 } NVM_MQTT_Config_ST;
@@ -135,7 +135,7 @@ typedef struct NVM_System_Upgrade_Parameter_Tag {
 typedef union NVM_Config_Tag {
   uint8_t Buff[1024];
   struct {
-    NVM_Firmware_Parameter_ST m_CfgFirmWare;
+//    NVM_Firmware_Parameter_ST m_CfgFirmWare;
     NVM_MQTT_Config_ST m_CfgMQTT;
   } BYTES;
 } NVM_Config_UN;

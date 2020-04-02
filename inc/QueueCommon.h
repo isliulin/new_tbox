@@ -560,12 +560,13 @@ ID_OTA vivian define
 #define ID_NVM_2_BLE_EVTF   0x6F
 
 #define ID_NVM_2_FW_SYNC   0x70
-#define ID_NVM_2_FW_SET_CONFIG   0x71
-#define ID_NVM_2_FW_SET_SYSTEM   0x72
-#define ID_NVM_2_FW_SET_FAULT   0x73
-#define ID_NVM_2_FW_GET_CONFIG   0x74
-#define ID_NVM_2_FW_GET_SYSTEM   0x75
-#define ID_NVM_2_FW_GET_FAULT   0x76
+//TODO: iiii
+#define ID_NVM_2_FW_THD_SET_CONFIG   0x71
+#define ID_NVM_2_FW_THD_SET_SYSTEM   0x72
+#define ID_NVM_2_FW_THD_SET_FAULT   0x73
+#define ID_NVM_2_FW_THD_GET_CONFIG   0x74
+#define ID_NVM_2_FW_THD_GET_SYSTEM   0x75
+#define ID_NVM_2_FW_THD_GET_FAULT   0x76
 #define ID_NVM_2_FW_EVT7   0x77
 #define ID_NVM_2_FW_EVT8   0x78
 #define ID_NVM_2_FW_EVT9   0x79
@@ -755,12 +756,12 @@ ID_OTA vivian define
 
 #define ID_FW_2_NVM_EVT0           0x50
 #define ID_FW_2_NVM_SYNC           0x51
-#define ID_FW_2_NVM_SET_CONFIG         0x52
-#define ID_FW_2_NVM_SET_SYSTEM           0x53
-#define ID_FW_2_NVM_SET_FAULT           0x54
-#define ID_FW_2_NVM_GET_CONFIG           0x55
-#define ID_FW_2_NVM_GET_SYSTEM           0x56
-#define ID_FW_2_NVM_GET_FAULT           0x57
+#define ID_FW_2_NVM_THD_SET_CONFIG         0x52
+#define ID_FW_2_NVM_THD_SET_SYSTEM           0x53
+#define ID_FW_2_NVM_THD_SET_FAULT           0x54
+#define ID_FW_2_NVM_THD_GET_CONFIG           0x55
+#define ID_FW_2_NVM_THD_GET_SYSTEM           0x56
+#define ID_FW_2_NVM_THD_GET_FAULT           0x57
 #define ID_FW_2_NVM_EVT8           0x58
 #define ID_FW_2_NVM_EVT9           0x59
 #define ID_FW_2_NVM_EVTA           0x5A

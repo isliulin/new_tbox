@@ -109,7 +109,8 @@ BOOL CNvm::Processing() {
         nvm_RecvQueue();
         nvm_WriteProcess();
 //        nvm_SendProcess();
-
+      case NVMWORK_BUSY:NVMLOG("[NVM_PROCESS]NVMWORK_BUSY!!\n");
+        nvm_SyncProcess();
         break;
       default:break;
     }
@@ -162,7 +163,7 @@ void CNvm::SendQueueTestTask() {
   static int count = 0;
   QueueTest.mtype = 1;
 
-  Framework::GetInstance()->fw_NvmSendQueue(ID_FW_2_NVM_SET_CONFIG);
+  Framework::GetInstance()->fw_NvmSendQueue(ID_FW_2_NVM_THD_SET_CONFIG);
 
 #if 0
   if ((Framework::GetInstance()->ID_Queue_NVM_To_FW > 0) && (count++ % 5 == 0)) {
@@ -219,24 +220,24 @@ int CNvm::nvm_SendQueue(uint8_t Gr, uint8_t Id) {
     case ID_NVM_2_FW_SYNC:NVMLOG("ID_NVM_2_FW_SYNC\n");
       m_stSndMsg.Msgs[0] = 0x63;
       break;
-    case ID_NVM_2_FW_GET_CONFIG:NVMLOG("ID_NVM_2_FW_GET_SYSTEM\n");
+    case ID_NVM_2_FW_THD_GET_CONFIG:NVMLOG("ID_NVM_2_FW_GET_SYSTEM\n");
       memcpy(&m_stSndMsg, &m_wFileFormat.m_stConfig, CFG_PART_SIZE);
       break;
-    case ID_NVM_2_FW_GET_SYSTEM:NVMLOG("ID_NVM_2_FW_GET_SYSTEM\n");
+    case ID_NVM_2_FW_THD_GET_SYSTEM:NVMLOG("ID_NVM_2_FW_GET_SYSTEM\n");
       memcpy(&m_stSndMsg, &m_wFileFormat.m_stSystem, SYS_PART_SIZE);
       break;
-    case ID_NVM_2_FW_GET_FAULT:NVMLOG("ID_NVM_2_FW_GET_FAULT\n");
+    case ID_NVM_2_FW_THD_GET_FAULT:NVMLOG("ID_NVM_2_FW_GET_FAULT\n");
       memcpy(&m_stSndMsg, &m_wFileFormat.m_stFault, FAU_PART_SIZE);
       break;
-    case ID_NVM_2_FW_SET_CONFIG:NVMLOG("ID_NVM_2_FW_SET_SYSTEM\n");
-      memcpy(&m_stSndMsg, &m_wFileFormat.m_stConfig, CFG_PART_SIZE);
-      break;
-    case ID_NVM_2_FW_SET_SYSTEM:NVMLOG("ID_NVM_2_FW_SET_SYSTEM\n");
-      memcpy(&m_stSndMsg, &m_wFileFormat.m_stSystem, SYS_PART_SIZE);
-      break;
-    case ID_NVM_2_FW_SET_FAULT:NVMLOG("ID_NVM_2_FW_SET_FAULT\n");
-      memcpy(&m_stSndMsg, &m_wFileFormat.m_stFault, FAU_PART_SIZE);
-      break;
+//    case ID_NVM_2_FW_SET_CONFIG:NVMLOG("ID_NVM_2_FW_SET_SYSTEM\n");
+//      memcpy(&m_stSndMsg, &m_wFileFormat.m_stConfig, CFG_PART_SIZE);
+//      break;
+//    case ID_NVM_2_FW_SET_SYSTEM:NVMLOG("ID_NVM_2_FW_SET_SYSTEM\n");
+//      memcpy(&m_stSndMsg, &m_wFileFormat.m_stSystem, SYS_PART_SIZE);
+//      break;
+//    case ID_NVM_2_FW_SET_FAULT:NVMLOG("ID_NVM_2_FW_SET_FAULT\n");
+//      memcpy(&m_stSndMsg, &m_wFileFormat.m_stFault, FAU_PART_SIZE);
+//      break;
     default:break;
 
   }
@@ -271,30 +272,34 @@ int CNvm::nvm_RecvQueue() {
     case GR_THD_SOURCE_NVM:
       switch (m_stRevMsg.head.Id) {
 
-        case ID_FW_2_NVM_SET_CONFIG:NVMLOG("ID_FW_2_NVM_SET_CONFIG\n");
+        case ID_FW_2_NVM_THD_SET_CONFIG:NVMLOG("ID_FW_2_NVM_SET_CONFIG\n");
           memset(&m_wFileFormat.m_stConfig, 0, sizeof(m_wFileFormat.m_stConfig));
           memcpy(&m_wFileFormat.m_stConfig, m_stRevMsg.Msgs, CFG_PART_SIZE);
           m_bDataChangeFlag = true;
           break;
-        case ID_FW_2_NVM_SET_SYSTEM:NVMLOG("ID_FW_2_NVM_SET_SYSTEM\n");
+        case ID_FW_2_NVM_THD_SET_SYSTEM:NVMLOG("ID_FW_2_NVM_SET_SYSTEM\n");
           memset(&m_wFileFormat.m_stSystem, 0, sizeof(m_wFileFormat.m_stSystem));
           memcpy(&m_wFileFormat.m_stSystem, m_stRevMsg.Msgs, SYS_PART_SIZE);
           m_bDataChangeFlag = true;
           break;
-        case ID_FW_2_NVM_SET_FAULT:NVMLOG("ID_FW_2_NVM_SET_FAULT\n");
+        case ID_FW_2_NVM_THD_SET_FAULT:NVMLOG("ID_FW_2_NVM_SET_FAULT\n");
           memset(&m_wFileFormat.m_stFault, 0, sizeof(m_wFileFormat.m_stFault));
           memcpy(&m_wFileFormat.m_stFault, m_stRevMsg.Msgs, FAU_PART_SIZE);
           m_bDataChangeFlag = true;
           break;
-        case ID_FW_2_NVM_GET_CONFIG:NVMLOG("ID_FW_2_NVM_GET_CONFIG\n");
-          nvm_SendQueue(GR_THD_SOURCE_NVM, ID_NVM_2_FW_GET_CONFIG);
+
+        case ID_FW_2_NVM_THD_GET_CONFIG:NVMLOG("ID_FW_2_NVM_GET_CONFIG\n");
+          nvm_SendQueue(GR_THD_SOURCE_NVM, ID_NVM_2_FW_THD_GET_CONFIG);
           break;
-        case ID_FW_2_NVM_GET_SYSTEM:NVMLOG("ID_FW_2_NVM_GET_SYSTEM\n");
-          nvm_SendQueue(GR_THD_SOURCE_NVM, ID_NVM_2_FW_GET_SYSTEM);
+        case ID_FW_2_NVM_THD_GET_SYSTEM:NVMLOG("ID_FW_2_NVM_GET_SYSTEM\n");
+          nvm_SendQueue(GR_THD_SOURCE_NVM, ID_NVM_2_FW_THD_GET_SYSTEM);
           break;
-        case ID_FW_2_NVM_GET_FAULT:NVMLOG("ID_FW_2_NVM_GET_FAULT\n");
-          nvm_SendQueue(GR_THD_SOURCE_NVM, ID_NVM_2_FW_GET_FAULT);
+        case ID_FW_2_NVM_THD_GET_FAULT:NVMLOG("ID_FW_2_NVM_GET_FAULT\n");
+          nvm_SendQueue(GR_THD_SOURCE_NVM, ID_NVM_2_FW_THD_GET_FAULT);
           break;
+
+
+
         default:NVMLOG("default \n");
           break;
 
@@ -449,6 +454,7 @@ int CNvm::nvm_WriteProcess() {
 
   m_u8WorkMode = NVMWORK_BUSY;
 
+  //FIXME:
   if (m_bDataChangeFlag) {
     for (int i = 0; i < 3; ++i) {
       ret = nvm_WriteFile();
@@ -494,28 +500,28 @@ int CNvm::nvm_DefaultRestore() {
          sizeof(m_stDataParameter.m_stFirmwareParameter.ICCID));
 #endif
 
-  memcpy(m_wFileFormat.m_stConfig.BYTES.m_CfgFirmWare.VIN,
-         DEFAULT_VIN,
-         sizeof(DEFAULT_VIN));
+//  memcpy(m_wFileFormat.m_stConfig.BYTES.m_CfgFirmWare.VIN,
+//         DEFAULT_VIN,
+//         sizeof(DEFAULT_VIN));
+//
+//  memcpy(m_wFileFormat.m_stConfig.BYTES.m_CfgFirmWare.IMEI,
+//         DEFAULT_IMEI,
+//         sizeof(DEFAULT_IMEI));
+//
+//  memcpy(m_wFileFormat.m_stConfig.BYTES.m_CfgFirmWare.CMEI,
+//         DEFAULT_CMEI,
+//         sizeof(DEFAULT_CMEI));
+//
+//  memcpy(m_wFileFormat.m_stConfig.BYTES.m_CfgFirmWare.ICCID,
+//         DEFAULT_ICCID,
+//         sizeof(DEFAULT_CMEI));
 
-  memcpy(m_wFileFormat.m_stConfig.BYTES.m_CfgFirmWare.IMEI,
-         DEFAULT_IMEI,
-         sizeof(DEFAULT_IMEI));
-
-  memcpy(m_wFileFormat.m_stConfig.BYTES.m_CfgFirmWare.CMEI,
-         DEFAULT_CMEI,
-         sizeof(DEFAULT_CMEI));
-
-  memcpy(m_wFileFormat.m_stConfig.BYTES.m_CfgFirmWare.ICCID,
-         DEFAULT_ICCID,
-         sizeof(DEFAULT_CMEI));
-
-  memcpy(m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_Host, DEFAULT_HOST, sizeof(DEFAULT_HOST));
+  memcpy(m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_ServerHost, DEFAULT_HOST, sizeof(DEFAULT_HOST));
 
 //  memcpy(m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_Ports, DEFAULT_PORTS, sizeof(DEFAULT_PORTS));
-  m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_Ports = DEFAULT_PORTS;
+  m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_ServerPorts = DEFAULT_PORTS;
 //  memcpy(m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_uReportFreq, DEFAULT_UREPORTFREQ, sizeof(DEFAULT_UREPORTFREQ));
-  m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_uReportFreq = DEFAULT_UREPORTFREQ;
+  m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_NormalReportFreq = DEFAULT_UREPORTFREQ;
 
   memcpy(m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_PskId, DEFAULT_PSKID, sizeof(DEFAULT_PSKID));
   memcpy(m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_CarType, DEFAULT_CARTYPE, sizeof(DEFAULT_CARTYPE));
@@ -525,7 +531,7 @@ int CNvm::nvm_DefaultRestore() {
 //  memcpy(m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_Alarm, DEFAULT_ALARM, sizeof(DEFAULT_ALARM));
   m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_Alarm = DEFAULT_ALARM;
 //  memcpy(m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_ReportFreq, DEFAULT_REPORTFREQ, sizeof(DEFAULT_REPORTFREQ));
-  m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_ReportFreq = DEFAULT_REPORTFREQ;
+  m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_SleepReportFreq = DEFAULT_REPORTFREQ;
 //  memcpy(m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_LogSwitch, DEFAULT_LOGSWITCH, sizeof(DEFAULT_LOGSWITCH));
   m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_LogSwitch = DEFAULT_LOGSWITCH;
 
@@ -541,7 +547,7 @@ int CNvm::nvm_DefaultRestore() {
 
   m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_KeepAlive = DEFAULT_KEEPALIVE;
   m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_Port = DEFAULT_PORT;
-  m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_MsgMaxSisz = DEFAULT_MSGMAXSISZ;
+  m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_MsgMaxSize = DEFAULT_MSGMAXSISZ;
   m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_TopicMaxSize = DEFAULT_TOPICMAXSIZE;
   m_wFileFormat.m_stConfig.BYTES.m_CfgMQTT.m_TestOrNormal = DEFAULT_TESTORNORMAL;
 
