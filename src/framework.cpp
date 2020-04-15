@@ -1127,17 +1127,74 @@ int Framework::fw_NvmSendQueue(uint8_t Id) {
 
   mFwQueueInfoSnd.mtype = 1;
   mFwQueueInfoSnd.head.Gr = (uint8_t) GR_THD_SOURCE_NVM;
-  mFwQueueInfoSnd.head.Id = (uint8_t) ID_FW_2_NVM_THD_SET_CONFIG;
-  memset(mFwQueueInfoSnd.Msgs, 0, sizeof(mFwQueueInfoSnd.Msgs));
+//  mFwQueueInfoSnd.head.Id = (uint8_t) ID_FW_2_NVM_THD_SET_CONFIG;
 
-  memcpy(mFwQueueInfoSnd.Msgs, "999999999", sizeof("999999999"));
+//fpp test
+  printf("fpp test \n");
+  printf("0x%x \n", Id);
+  switch (Id) {
 
-  printf("********** %s \n", mFwQueueInfoSnd.Msgs);
+    case ID_FW_2_NVM_THD_SET_CONFIG: {
+      mFwQueueInfoSnd.head.Id = (uint8_t) ID_FW_2_NVM_THD_SET_CONFIG;
+      memset(mFwQueueInfoSnd.Msgs, 0, sizeof(mFwQueueInfoSnd.Msgs));
 
-  retLen = msgsnd(m_instance->ID_Queue_FW_To_NVM,
-                  (void *) &mFwQueueInfoSnd,
-                  sizeof("999999999") + sizeof(ParaInfoHead_ST),
-                  IPC_NOWAIT);
+      memcpy(mFwQueueInfoSnd.Msgs, "999999999", sizeof("999999999"));
+
+      printf("********** %s \n", mFwQueueInfoSnd.Msgs);
+
+      retLen = msgsnd(m_instance->ID_Queue_FW_To_NVM,
+                      (void *) &mFwQueueInfoSnd,
+                      sizeof("999999999") + sizeof(ParaInfoHead_ST),
+                      IPC_NOWAIT);
+    }
+      break;
+    case ID_FW_2_NVM_THD_GET_SYSTEM: { break; }
+    case ID_FW_2_NVM_THD_GET_FAULT: { break; }
+    case ID_FW_2_NVM_THD_SET_SNAPSHOT: {
+
+//      NVM_Fault_Snapshot_ST testSS{
+//          .m_Battery_Voltage = 1,
+//          .m_4g_Dialing_Status = 2,
+//          .m_Background_Connection_Status = 3,
+//          .m_BLE_Communication_Status = 4,
+//          .m_Dynamic_State = 5,
+//          .m_MCU_Communication_Status = 6,
+//          .m_Positioning_Status = 7,
+//          .m_SIM_Card_Status = 8,
+//          .m_System_Date = 9
+//      };
+      printf("fpp snapshot \n");
+
+      NVM_Fault_Snapshot_ST testSS;
+      memset(&testSS, 0, sizeof(testSS));
+
+      memcpy(testSS.m_System_Date, "1234", sizeof("1234"));
+      memcpy(testSS.m_Battery_Voltage, "2", sizeof("2"));
+      memcpy(testSS.m_Dynamic_State, "3", sizeof("3"));
+      memcpy(testSS.m_4g_Dialing_Status, "4", sizeof("4"));
+      memcpy(testSS.m_Background_Connection_Status, "5", sizeof("5"));
+      memcpy(testSS.m_Positioning_Status, "6", sizeof("6"));
+      memcpy(testSS.m_MCU_Communication_Status, "7", sizeof("7"));
+      memcpy(testSS.m_BLE_Communication_Status, "8", sizeof("8"));
+      memcpy(testSS.m_SIM_Card_Status, "9", sizeof("9"));
+
+      mFwQueueInfoSnd.head.Id = (uint8_t) ID_FW_2_NVM_THD_SET_SNAPSHOT;
+
+      memset(mFwQueueInfoSnd.Msgs, 0, sizeof(mFwQueueInfoSnd.Msgs));
+      memcpy(mFwQueueInfoSnd.Msgs, &testSS, sizeof(testSS));
+
+      printf("fpp snapshot2 \n");
+
+      retLen = msgsnd(m_instance->ID_Queue_FW_To_NVM,
+                      (void *) &mFwQueueInfoSnd,
+                      sizeof(testSS) + sizeof(ParaInfoHead_ST),
+                      IPC_NOWAIT);
+
+      break;
+    }
+    default: { break; }
+  }
+
 }
 
 int Framework::fw_TspSendQueue(uint8_t Id) {

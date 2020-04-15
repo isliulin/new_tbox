@@ -115,7 +115,8 @@ BOOL CNvm::Processing() {
       default:break;
     }
 
-    Sleep(NVM_THREAD_PERIOD);
+//    Sleep(NVM_THREAD_PERIOD);
+    Sleep(5000000);
 #endif
   }
 
@@ -272,22 +273,61 @@ int CNvm::nvm_RecvQueue() {
     case GR_THD_SOURCE_NVM:
       switch (m_stRevMsg.head.Id) {
 
-        case ID_FW_2_NVM_THD_SET_CONFIG:NVMLOG("ID_FW_2_NVM_SET_CONFIG\n");
+        case ID_FW_2_NVM_THD_SET_CONFIG: {
+          NVMLOG("ID_FW_2_NVM_SET_CONFIG\n");
           memset(&m_wFileFormat.m_stConfig, 0, sizeof(m_wFileFormat.m_stConfig));
           memcpy(&m_wFileFormat.m_stConfig, m_stRevMsg.Msgs, CFG_PART_SIZE);
           m_bDataChangeFlag = true;
           break;
-        case ID_FW_2_NVM_THD_SET_SYSTEM:NVMLOG("ID_FW_2_NVM_SET_SYSTEM\n");
+        }
+        case ID_FW_2_NVM_THD_SET_SYSTEM: {
+          NVMLOG("ID_FW_2_NVM_SET_SYSTEM\n");
           memset(&m_wFileFormat.m_stSystem, 0, sizeof(m_wFileFormat.m_stSystem));
           memcpy(&m_wFileFormat.m_stSystem, m_stRevMsg.Msgs, SYS_PART_SIZE);
           m_bDataChangeFlag = true;
           break;
-        case ID_FW_2_NVM_THD_SET_FAULT:NVMLOG("ID_FW_2_NVM_SET_FAULT\n");
+        }
+        case ID_FW_2_NVM_THD_SET_FAULT: {
+          NVMLOG("ID_FW_2_NVM_SET_FAULT\n");
           memset(&m_wFileFormat.m_stFault, 0, sizeof(m_wFileFormat.m_stFault));
           memcpy(&m_wFileFormat.m_stFault, m_stRevMsg.Msgs, FAU_PART_SIZE);
           m_bDataChangeFlag = true;
           break;
+        }
+        case ID_FW_2_NVM_THD_SET_SNAPSHOT: {
+          NVMLOG("ID_FW_2_NVM_THD_SET_SNAPSHOT\n");
 
+          NVM_Fault_Snapshot_ST temp;
+          memset(&temp, 0, sizeof(temp));
+          memcpy(&temp, m_stRevMsg.Msgs, sizeof(temp));
+          int i;
+
+
+//          for (NVM_Fault_Snapshot_ST s:m_wFileFormat.m_stFault.BYTES.m_snapshot) {
+          for (i = 0; i < SNAPSHOT_SIZE; i++) {
+            m_SnapshotQueue.push(m_wFileFormat.m_stFault.BYTES.m_snapshot[i]);
+          }
+
+          if (m_SnapshotQueue.size() < SNAPSHOT_SIZE) {
+            m_SnapshotQueue.push(temp);
+          } else {
+            m_SnapshotQueue.pop();
+            m_SnapshotQueue.push(temp);
+          }
+
+          for (i = 0; i < SNAPSHOT_SIZE; i++) {
+            printf("============%d\n", i);
+            if (!m_SnapshotQueue.empty()) {
+              printf("============%d\n", i);
+              m_wFileFormat.m_stFault.BYTES.m_snapshot[i] = m_SnapshotQueue.front();
+              printf("wwwwwwwwwww %d\n", m_wFileFormat.m_stFault.BYTES.m_snapshot[i].m_Battery_Voltage);
+              m_SnapshotQueue.pop();
+            }
+          }
+
+          m_bDataChangeFlag = true;
+          break;
+        }
         case ID_FW_2_NVM_THD_GET_CONFIG:NVMLOG("ID_FW_2_NVM_GET_CONFIG\n");
           nvm_SendQueue(GR_THD_SOURCE_NVM, ID_NVM_2_FW_THD_GET_CONFIG);
           break;
@@ -297,8 +337,6 @@ int CNvm::nvm_RecvQueue() {
         case ID_FW_2_NVM_THD_GET_FAULT:NVMLOG("ID_FW_2_NVM_GET_FAULT\n");
           nvm_SendQueue(GR_THD_SOURCE_NVM, ID_NVM_2_FW_THD_GET_FAULT);
           break;
-
-
 
         default:NVMLOG("default \n");
           break;
@@ -340,6 +378,10 @@ int CNvm::nvm_WriteFile() {
   printf("m_stConfig size %d \n", sizeof(m_wFileFormat.m_stConfig));
   printf("m_stSystem size %d \n", sizeof(m_wFileFormat.m_stSystem));
   printf("m_stFault size %d \n", sizeof(m_wFileFormat.m_stFault));
+  printf("m_fault_manager_st size %d \n", sizeof(m_wFileFormat.m_stFault.BYTES.m_fault_manager_st));
+  printf("BYTES size %d \n", sizeof(m_wFileFormat.m_stFault.BYTES));
+  printf("m_snapshot1 size %d \n", sizeof(m_wFileFormat.m_stFault.BYTES.m_snapshot));
+
   printf("m_Crc32 size %d \n", sizeof(m_wFileFormat.m_Crc32));
 
   fwrite(&m_wFileFormat, sizeof(m_wFileFormat), sizeof(uint8_t), fp);
@@ -446,6 +488,14 @@ int CNvm::nvm_Init() {
     m_bDataChangeFlag = true;
     nvm_WriteProcess();
   }
+
+//  for (auto s:m_wFileFormat.m_stFault.BYTES.m_snapshot) {
+  for (int i = 0; i < SNAPSHOT_SIZE; ++i) {
+    printf("+++++++++++++++++++++%d\n", m_wFileFormat.m_stFault.BYTES.m_snapshot[i].m_Background_Connection_Status);
+    m_SnapshotQueue.push(m_wFileFormat.m_stFault.BYTES.m_snapshot[i]);
+  }
+
+  printf(" NVM INIT FINISH \n ");
 
   return 0;
 }

@@ -20,8 +20,8 @@ set(DIR_MDM9607 ${MYSYSROOT}/mdm9607-perf)
 SET(CMAKE_C_COMPILER ${MYSYSROOT}/x86_64-linux/usr/bin/arm-oe-linux-gnueabi/arm-oe-linux-gnueabi-gcc)
 SET(CMAKE_CXX_COMPILER ${MYSYSROOT}/x86_64-linux/usr/bin/arm-oe-linux-gnueabi/arm-oe-linux-gnueabi-g++)
 
-set(AFLAGS "-march=armv7-a -mfloat-abi=softfp -mfpu=neon ")
-set(BFLAGS "-O2 -fpermissive -Dstrlcpy=g_strlcpy -Dstrlcat=g_strlcat -DATCA_HAL_I2C -DATCAPRINTF -DUSE_GLIB -DBUILD_VERSION_WIFI_RTL -fdiagnostics-color=auto ")
+set(AFLAGS "-march=armv7-a -mfloat-abi=softfp -mfpu=neon -g ")
+set(BFLAGS " -O2 -fpermissive -Dstrlcpy=g_strlcpy -Dstrlcat=g_strlcat -DATCA_HAL_I2C -DATCAPRINTF -DUSE_GLIB -DBUILD_VERSION_WIFI_RTL -fdiagnostics-color=auto ")
 string(CONCAT ALL_FLAGS ${AFLAGS} ${BFLAGS})
 
 

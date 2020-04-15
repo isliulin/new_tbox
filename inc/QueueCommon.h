@@ -762,7 +762,7 @@ ID_OTA vivian define
 #define ID_FW_2_NVM_THD_GET_CONFIG           0x55
 #define ID_FW_2_NVM_THD_GET_SYSTEM           0x56
 #define ID_FW_2_NVM_THD_GET_FAULT           0x57
-#define ID_FW_2_NVM_EVT8           0x58
+#define ID_FW_2_NVM_THD_SET_SNAPSHOT           0x58
 #define ID_FW_2_NVM_EVT9           0x59
 #define ID_FW_2_NVM_EVTA           0x5A
 #define ID_FW_2_NVM_EVTB           0x5B

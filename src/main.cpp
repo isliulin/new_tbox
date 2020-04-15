@@ -981,7 +981,8 @@ int main(int argc, char *argv[]) {
 //	Set_CpuFreqValue(CPU_NAX_FREQ);
   while (1) {
 
-    Framework::GetInstance()->fw_NvmSendQueue(ID_FW_2_NVM_THD_SET_CONFIG);
+    printf("main toooooooooooooooooo \n");
+    Framework::GetInstance()->fw_NvmSendQueue(ID_FW_2_NVM_THD_SET_SNAPSHOT);
     sleep(5);
   }
 
