@@ -115,8 +115,8 @@ BOOL CNvm::Processing() {
       default:break;
     }
 
-//    Sleep(NVM_THREAD_PERIOD);
-    Sleep(5000000);
+    Sleep(NVM_THREAD_PERIOD);
+//    Sleep(5000000);
 #endif
   }
 
@@ -384,9 +384,23 @@ int CNvm::nvm_WriteFile() {
 
   printf("m_Crc32 size %d \n", sizeof(m_wFileFormat.m_Crc32));
 
+  printf("m_Crc32 0x%x \n", m_wFileFormat.m_Crc32);
+
+  uint8_t Buff[INFOSIZE] = {0};
+  uint32_t crc32 = NULL;
+
+  memset(&Buff, 0, sizeof(Buff));
+  memcpy(&Buff, &m_wFileFormat, sizeof(Buff));
+  crc32 = getCRC32(gl_crc, Buff, INFOSIZE);
+
+  memset(&m_wFileFormat.m_Crc32, 0, sizeof(m_wFileFormat.m_Crc32));
+  memcpy(&m_wFileFormat.m_Crc32, &crc32, sizeof(m_wFileFormat.m_Crc32));
+
   fwrite(&m_wFileFormat, sizeof(m_wFileFormat), sizeof(uint8_t), fp);
 
   fclose(fp);
+
+  system("cp /data/nvm /cache/nvm");
   NVMLOG("nvm_WriteFile finish \n");
 
   return C_TRUE;
